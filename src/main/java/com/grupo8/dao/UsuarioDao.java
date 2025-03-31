@@ -128,7 +128,7 @@ public class UsuarioDao {
         }
     }
 
-    public Optional<String> validarCredenciales(String nickname, String pass) throws Exception {
+    public String validarCredenciales(String nickname, String pass) throws Exception {
         String sql = "SELECT ID_USUARIO FROM USUARIOS WHERE NICKNAME = ? AND PASS = ?";
 
         try (Connection conn = OracleConnectionUtil.getConnection();
@@ -139,10 +139,10 @@ public class UsuarioDao {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return Optional.of(rs.getString("ID_USUARIO"));
+                return rs.getString("ID_USUARIO");
             } 
             else {
-                return Optional.empty();
+                return "Credenciales no coinciden con los registros.";
             }
 
         } catch (SQLException e) {
