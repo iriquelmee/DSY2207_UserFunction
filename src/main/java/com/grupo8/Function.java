@@ -141,7 +141,7 @@ public class Function {
         LoginReq loginReq = loginReqOpt.get();
 
         try {
-            Optional<String> idUsuario = usuarioDAO.validarCredenciales(loginReq.getNickname(), loginReq.getPass());
+            String idUsuario = usuarioDAO.validarCredenciales(loginReq.getNickname(), loginReq.getPass());
 
             if (!idUsuario.isEmpty()) {
                 return request.createResponseBuilder(HttpStatus.OK).body("{\"status\": \"success\", \"message\": \"Inicio de sesion exitoso.\", \"ID_USUARIO\": \"" + idUsuario + "\"}").build();
