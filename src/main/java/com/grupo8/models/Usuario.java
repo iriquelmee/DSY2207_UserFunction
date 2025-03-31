@@ -8,12 +8,13 @@ public class Usuario {
     private String rut;
     private String email;
     private String telefono;
+    private String pass;
 
     public Usuario() {
 
     }
 
-    public Usuario(String id, String nombre, String apellido, String nickname, String rut, String email, String telefono) {
+    public Usuario(String id, String nombre, String apellido, String nickname, String rut, String email, String telefono, String pass) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -21,6 +22,7 @@ public class Usuario {
         this.rut = rut;
         this.email = email;
         this.telefono = telefono;
+        this.pass =pass;
     }
 
     public String getId() { return id; }
@@ -37,4 +39,6 @@ public class Usuario {
     public void setEmail(String email) { this.email = email; }
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
+    public String getPass() { return pass; }
+    public void setPass(String pass) { this.pass = pass; }
 }
