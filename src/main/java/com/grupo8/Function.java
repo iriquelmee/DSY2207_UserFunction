@@ -1,6 +1,7 @@
 package com.grupo8;
 
 import com.grupo8.dao.UsuarioDao;
+import com.grupo8.models.LoginReq;
 import com.grupo8.models.Usuario;
 import com.microsoft.azure.functions.*;
 import com.microsoft.azure.functions.annotation.AuthorizationLevel;
@@ -125,4 +126,36 @@ public class Function {
             return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al buscar el usuario.").build();
         }
     }
+
+    @FunctionName("loginUsuario")
+    public HttpResponseMessage loginUsuario(@HttpTrigger(name = "req", methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS) HttpRequestMessage<Optional<LoginReq>> request, ExecutionContext context) {
+
+        context.getLogger().info("Procesando login de usuario...");
+
+        Optional<LoginReq> loginReqOpt = request.getBody();
+
+        if (!loginReqOpt.isPresent() || loginReqOpt.get().getNickname() == null || loginReqOpt.get().getPass() == null) {
+            return request.createResponseBuilder(HttpStatus.BAD_REQUEST).body("{\"status\": \"error\", \"message\": \"Se requieren el nickname y la contraseña.\"}").build();
+        }
+
+        LoginReq loginReq = loginReqOpt.get();
+
+        try {
+            Optional<String> idUsuario = usuarioDAO.validarCredenciales(loginReq.getNickname(), loginReq.getPass());
+
+            if (!idUsuario.isEmpty()) {
+                return request.createResponseBuilder(HttpStatus.OK).body("{\"status\": \"success\", \"message\": \"Inicio de sesion exitoso.\", \"ID_USUARIO\": \"" + idUsuario + "\"}").build();
+            } 
+            else {
+                return request.createResponseBuilder(HttpStatus.UNAUTHORIZED).body("{\"status\": \"error\", \"message\": \"Credenciales incorrectas.\"}").build();
+            }
+            
+        } 
+        catch (Exception e) {
+            context.getLogger().severe("Error en la base de datos: " + e.getMessage());
+            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"status\": \"error\", \"message\": \"Error al procesar la solicitud.\"}").build();
+        }
+    }
+
+
 }

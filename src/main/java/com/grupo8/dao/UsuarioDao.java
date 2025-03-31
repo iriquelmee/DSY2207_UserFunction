@@ -127,4 +127,28 @@ public class UsuarioDao {
             throw new Exception("Error al buscar usuario por RUT: " + e.getMessage(), e);
         }
     }
+
+    public Optional<String> validarCredenciales(String nickname, String pass) throws Exception {
+        String sql = "SELECT ID_USUARIO FROM USUARIOS WHERE NICKNAME = ? AND PASS = ?";
+
+        try (Connection conn = OracleConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, nickname);
+            ps.setString(2, pass);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return Optional.of(rs.getString("ID_USUARIO"));
+            } 
+            else {
+                return Optional.empty();
+            }
+
+        } catch (SQLException e) {
+            throw new Exception("Error al buscar usuario por Rut: " + e.getMessage(), e);
+        }
+    }
+    
+
 }
