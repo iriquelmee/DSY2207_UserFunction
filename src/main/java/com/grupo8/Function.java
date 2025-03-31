@@ -112,7 +112,7 @@ public class Function {
         UsuarioDao usuarioDao = new UsuarioDao();
         
         try {
-            Usuario usuario = usuarioDao.buscarPorRut(rut);
+            Optional<Usuario> usuario = usuarioDao.buscarPorRut(rut);
 
             if (usuario != null) {
                 return request.createResponseBuilder(HttpStatus.OK).body(usuario).build();

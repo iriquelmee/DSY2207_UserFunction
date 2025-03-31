@@ -6,11 +6,12 @@ import com.grupo8.models.Usuario;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class UsuarioDao {
 
     public void insertar(Usuario usuario) throws Exception {
-        String sql = "INSERT INTO USUARIOS (NOMBRE, APELLIDO, NICKNAME, RUT, EMAIL, TELEFONO) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO USUARIOS (NOMBRE, APELLIDO, NICKNAME, RUT, EMAIL, TELEFONO, PASS) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = OracleConnectionUtil.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -20,6 +21,7 @@ public class UsuarioDao {
             ps.setString(4, usuario.getRut());
             ps.setString(5, usuario.getEmail());
             ps.setString(6, usuario.getTelefono());
+            ps.setString(7, usuario.getPass());
 
             ps.executeUpdate();
             System.out.println("Usuario insertado correctamente.");
@@ -97,7 +99,7 @@ public class UsuarioDao {
         return usuarios;
     }
 
-    public Usuario buscarPorRut(String rut) throws Exception {
+    public Optional<Usuario> buscarPorRut(String rut) throws Exception {
         String sql = "SELECT * FROM USUARIOS WHERE RUT = ?";
 
         try (Connection conn = OracleConnectionUtil.getConnection();
@@ -116,9 +118,9 @@ public class UsuarioDao {
                 usuario.setEmail(rs.getString("EMAIL"));
                 usuario.setTelefono(rs.getString("TELEFONO"));
 
-                return usuario;
+                return Optional.of(usuario);
             } else {
-                return null;
+                return Optional.empty();
             }
 
         } catch (SQLException e) {
