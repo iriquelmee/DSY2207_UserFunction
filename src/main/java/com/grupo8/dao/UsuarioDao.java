@@ -10,11 +10,10 @@ import java.util.Optional;
 
 public class UsuarioDao {
 
-    public void insertar(Usuario usuario) throws Exception {
+    public Integer insertar(Usuario usuario) throws Exception {
         String sql = "INSERT INTO USUARIOS (NOMBRE, APELLIDO, NICKNAME, RUT, EMAIL, TELEFONO, PASS) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = OracleConnectionUtil.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = OracleConnectionUtil.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, new String[] { "ID_USUARIO" })){
             ps.setString(1, usuario.getNombre());
             ps.setString(2, usuario.getApellido());
             ps.setString(3, usuario.getNickname());
@@ -23,8 +22,22 @@ public class UsuarioDao {
             ps.setString(6, usuario.getTelefono());
             ps.setString(7, usuario.getPass());
 
-            ps.executeUpdate();
-            System.out.println("Usuario insertado correctamente.");
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new Exception("Error: no se insertó ningún usuario.");
+            }
+    
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int idGenerado = generatedKeys.getInt(1);
+                    System.out.println("Usuario insertado correctamente con ID: " + idGenerado);
+                    return idGenerado;
+                } 
+                else {
+                    throw new Exception("Error: no se generó un ID para el usuario insertado.");
+                }
+            }
         } catch (SQLException e) {
             throw new Exception("Error al insertar usuario: " + e.getMessage(), e);
         }

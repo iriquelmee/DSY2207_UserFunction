@@ -27,13 +27,25 @@ public class Function {
         Usuario usuario = usuarioOpt.get();
 
         try {
-            usuarioDAO.insertar(usuario);
-            return request.createResponseBuilder(HttpStatus.OK).body("Usuario insertado correctamente.").build();
+            int usuarioId = usuarioDAO.insertar(usuario);
+        
+            if (usuarioId > 0) {
+                //String mensaje = "Usuario insertado correctamente con ID: " + usuarioId;
+                String jsonResponse = "{\"message\":\"Usuario insertado correctamente.\",\"status\":\"success\",\"code\":200,\"data\":{\"usuarioId\":" + usuarioId + "}}";
+
+                return request.createResponseBuilder(HttpStatus.OK).body(jsonResponse).build();
+            } 
+            else {
+                String mensaje = "Error: El usuario no fue insertado correctamente (ID inválido).";
+                context.getLogger().severe(mensaje);
+                return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR).body(mensaje).build();
+            }
         } 
         catch (Exception e) {
             context.getLogger().severe("Error al insertar el usuario: " + e.getMessage());
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al insertar el usuario en la base de datos").build();
+            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al insertar el usuario en la base de datos: " + e.getMessage()).build();
         }
+        
     }
 
     @FunctionName("actualizarUsuario")
